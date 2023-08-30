@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:todoflutter/util/my_button.dart';
 
 class DialogBox extends StatefulWidget {
-  final controller;
+  final taskNameController;
+  final taskDescriptionController;
   VoidCallback onSave;
   VoidCallback onCancel;
 
   DialogBox({
     Key? key,
-    required this.controller,
+    required this.taskNameController,
+    required this.taskDescriptionController,
     required this.onSave,
     required this.onCancel,
   }) : super(key: key);
@@ -19,28 +21,48 @@ class DialogBox extends StatefulWidget {
 
 class _DialogBoxState extends State<DialogBox> {
   final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: Colors.yellow[300],
       content: Container(
-        height: 130,
+        height: 180,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             // get user input
             Form(
               key: _formKey,
-              child: TextFormField(
-                validator: (value){
-                  if (value!.isEmpty){
-                    return "Please enter some text";
-                  }
-                },
-                controller: widget.controller,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: "Add a new task",
+              child: Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    TextFormField(
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "Please enter some text";
+                        }
+                      },
+                      controller: widget.taskNameController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: "Add a new task",
+                      ),
+                    ),
+                    TextFormField(
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "Please enter some text";
+                        }
+                      },
+                      controller: widget.taskDescriptionController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: "Add a description",
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

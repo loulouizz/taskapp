@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:todoflutter/data/database.dart';
@@ -15,7 +13,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   // reference the hive box
-  final _myBox = Hive.box('mybox');
+  final _myBox = Hive.box('mybox1');
   ToDoDataBase db = ToDoDataBase();
 
   @override
@@ -34,13 +32,14 @@ class _HomePageState extends State<HomePage> {
 
 
   // text controller
-  final _controller = TextEditingController();
+  final _taskNameController = TextEditingController();
+  final _taskDescriptionController = TextEditingController();
 
 
   //checkbox was tapped
   void checkBoxChanged(bool? value, int index) {
     setState(() {
-      db.toDoList[index][1] = !db.toDoList[index][1];
+      db.toDoList[index][2] = !db.toDoList[index][2];
     });
     db.updateDataBase();
   }
@@ -48,12 +47,48 @@ class _HomePageState extends State<HomePage> {
   // save new task
   void saveNewTask() {
     setState(() {
-      db.toDoList.add([_controller.text, false]);
-      _controller.clear();
+      db.toDoList.add([_taskNameController.text, _taskDescriptionController.text, false]);
+      _taskNameController.clear();
+      _taskDescriptionController.clear();
     });
     Navigator.of(context).pop();
     db.updateDataBase();
   }
+
+  void updateTask(int index, String newName, String newDescription) {
+    db.toDoList[index][0] = newName;
+    db.toDoList[index][1] = newDescription;
+    db.updateDataBase();
+  }
+
+  void editTask(int index) {
+    _taskNameController.text = db.toDoList[index][0];
+    _taskDescriptionController.text = db.toDoList[index][1];
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return DialogBox(
+          taskNameController: _taskNameController,
+          taskDescriptionController: _taskDescriptionController,
+          onSave: () {
+            updateTask(index, _taskNameController.text, _taskDescriptionController.text);
+            _taskNameController.clear();
+            _taskDescriptionController.clear();
+            Navigator.of(context).pop();
+            setState(() {}); // Atualiza a interface do usuário
+          },
+          onCancel: () {
+            _taskNameController.clear();
+            _taskDescriptionController.clear();
+            Navigator.of(context).pop();
+          },
+        );
+      },
+    );
+  }
+
+
 
   //create a new task
   void createNewTask() {
@@ -61,7 +96,8 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (context) {
         return DialogBox(
-          controller: _controller,
+          taskNameController: _taskNameController,
+          taskDescriptionController: _taskDescriptionController,
           onSave: saveNewTask,
           onCancel: () => Navigator.of(context).pop(),
         );
@@ -100,9 +136,11 @@ class _HomePageState extends State<HomePage> {
           itemBuilder: (context, index) {
             return ToDoTile(
               taskName: db.toDoList[index][0],
-              taskCompleted: db.toDoList[index][1],
+              taskCompleted: db.toDoList[index][2],
+              description: db.toDoList[index][1],
               onChanged: (value) => checkBoxChanged(value, index),
               deleteFunction: (context) => deleteTask(index),
+              editFunction: (context) => editTask(index),
             );
           },
         ));

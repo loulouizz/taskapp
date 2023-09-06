@@ -27,7 +27,7 @@ class _DialogBoxState extends State<DialogBox> {
     return AlertDialog(
       backgroundColor: Colors.yellow[300],
       content: Container(
-        height: 180,
+        height: 210,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -40,7 +40,7 @@ class _DialogBoxState extends State<DialogBox> {
                   children: [
                     TextFormField(
                       validator: (value) {
-                        if (value!.isEmpty) {
+                        if (value! == "") {
                           return "Please enter some text";
                         }
                       },
@@ -72,7 +72,12 @@ class _DialogBoxState extends State<DialogBox> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 // save button
-                MyButton(text: "Save", onPressed: widget.onSave),
+                MyButton(text: "Save", onPressed: (){
+                  if(_formKey.currentState!.validate()){
+                    widget.onSave;
+                  }
+
+                }),
 
                 const SizedBox(width: 8),
 
